@@ -35,7 +35,6 @@ public class ConsoleGame
             (int Row, int Column) nextPlay;
             if (nextPlayer == playerName)
             {
-                // I/O
                 nextPlay = GetPlayFromInput();
             }
             else

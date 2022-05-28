@@ -1,8 +1,10 @@
+[Flags]
 public enum PositionState
 {
     None = 0,
     Player = 1,
     Opponent = 2,
+    Both = 3,
 }
 
 public static class PositionStateExtensions
