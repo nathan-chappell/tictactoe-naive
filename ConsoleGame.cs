@@ -39,7 +39,7 @@ public class ConsoleGame
             }
             else
             {
-                nextPlay = opponentStrategy.GetNextPlay(currentState, opponentName);
+                nextPlay = opponentStrategy.GetNextMove(currentState, opponentName);
             }
             var nextState = currentState.WithPosition(nextPlay.Row, nextPlay.Column, nextPlayer);
             trace.Add(nextState);

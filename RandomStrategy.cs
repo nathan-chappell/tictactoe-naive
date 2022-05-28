@@ -4,7 +4,7 @@ public class RandomStrategy : ITicTacToeStrategy
 
     public RandomStrategy() { }
 
-    public (int Row, int Column) GetNextPlay(TicTacToeState state, PositionState name)
+    public (int Row, int Column) GetNextMove(TicTacToeState state, PositionState name)
     {
         var availableMoves = GetAvailableMoves(state, name);
         return availableMoves[_random.Next(availableMoves.Count)];

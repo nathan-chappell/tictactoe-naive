@@ -81,6 +81,15 @@ public readonly struct TicTacToeState
     public List<PositionState> GetDiagonalFromTopLeft() => GetPattern(0, 1, 0, 1);
     public List<PositionState> GetDiagonalFromTopRight() => GetPattern(0, 1, 2, -1);
 
+    public IEnumerable<(int Row, int Column)> GetAvailableMoves()
+    {
+        for (int row = 0; row < 3; ++row)
+            for (int column = 0; column < 3; ++column)
+                    if (GetPositionState(row,column) != PositionState.None)
+                        continue;
+                    else yield return (row, column);
+    }
+
     public (int PlayerCount, int OpponentCount, int NoneCount) GetPositionCounts()
     {
         int playerCount = 0;

@@ -11,6 +11,6 @@ Console.WriteLine($"You are: {PositionState.Player}");
 foreach (var state in TicTacToeState.GetAllStates().Where(state => state.IsTerminal && state.IsValid).Take(100))
 {
     Console.WriteLine($"Winner: {state.GetWinner()}");
-    Console.WriteLine($"Value: {vf.values[state.Representation]}");
+    Console.WriteLine($"Value: {vf.Values[state.Representation]}");
     Console.WriteLine(state.GetDisplayString());
 }
