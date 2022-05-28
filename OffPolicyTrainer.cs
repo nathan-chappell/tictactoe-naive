@@ -23,8 +23,6 @@ public class OffPolicyTrainer
         }
     }
 
-    public record EvaluationResult(int Iterations, int Draws, int Losses, int Wins);
-
     public EvaluationResult Evaluate(
         ITicTacToeStrategy player,
         ITicTacToeStrategy opponent,
@@ -35,16 +33,33 @@ public class OffPolicyTrainer
         int draws = 0;
         for (int iteration = 0; iteration < iterations; ++iteration)
         {
-            var firstPlayer = random.NextDouble() > .5 ? PositionState.Player : PositionState.Opponent;
-            var (states, winner) = RunGame(player, opponent, firstPlayer);
+            // var firstPlayer = random.NextDouble() > .5 ? PositionState.Player : PositionState.Opponent;
+            PositionState winner;
+            if (random.NextDouble() > .5)
+            {
+                var (states, _winner) = RunGame(player, opponent);
+                winner = _winner;
+            }
+            else
+            {
+                var (states, _winner) = RunGame(player, opponent);
+                winner = _winner switch
+                {
+                    PositionState.None => PositionState.None,
+                    PositionState.Opponent => PositionState.Player,
+                    PositionState.Player => PositionState.Opponent,
+                    _ => throw new NotImplementedException(),
+                };
+            }
             switch (winner)
             {
-                case PositionState.None: wins += 1; break;
+                case PositionState.None: draws += 1; break;
                 case PositionState.Player: wins += 1; break;
-                case PositionState.Opponent: wins += 1; break;
+                case PositionState.Opponent: losses += 1; break;
                 default:
                     break;
             }
+            // Console.WriteLine(states.Last().GetDisplayString());
         }
         return new(
             Iterations: iterations,
@@ -54,13 +69,34 @@ public class OffPolicyTrainer
         );
     }
 
+    private (List<TicTacToeState> States, PositionState Winner) RunRandomGame(
+        ITicTacToeStrategy player,
+        ITicTacToeStrategy opponent)
+    {
+        if (random.NextDouble() > .5)
+        {
+            var (states, _winner) = RunGame(player, opponent);
+            winner = _winner;
+        }
+        else
+        {
+            var (states, _winner) = RunGame(player, opponent);
+            winner = _winner switch
+            {
+                PositionState.None => PositionState.None,
+                PositionState.Opponent => PositionState.Player,
+                PositionState.Player => PositionState.Opponent,
+                _ => throw new NotImplementedException(),
+            };
+        }
+    }
+
     private (List<TicTacToeState> States, PositionState Winner) RunGame(
         ITicTacToeStrategy player,
-        ITicTacToeStrategy opponent,
-        PositionState firstPlayer)
+        ITicTacToeStrategy opponent)
     {
         var states = new List<TicTacToeState>() { new TicTacToeState(0) };
-        PositionState currentPlayer = firstPlayer;
+        PositionState currentPlayer = PositionState.Player;
         PositionState winner = PositionState.None;
         while (states.Count < 9)
         {
@@ -73,6 +109,9 @@ public class OffPolicyTrainer
             winner = nextState.GetWinner();
             if (winner != PositionState.None)
                 break;
+            currentPlayer = currentPlayer == PositionState.Player
+                ? PositionState.Opponent
+                : PositionState.Player;
         }
         return (states, winner);
     }

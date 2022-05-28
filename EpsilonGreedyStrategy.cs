@@ -15,6 +15,6 @@ public class EpsilonGreedyStrategy : ITicTacToeStrategy
         var nextMoves = state.GetAvailableMoves().ToList();
         if (random.NextDouble() < Epsilon)
             return nextMoves[random.Next(0, nextMoves.Count)];
-        return nextMoves.OrderBy(move => ValueFunction.GetValue(state.WithPosition(move.Row,move.Column,name))).Last();
+        return nextMoves.OrderBy(move => ValueFunction.GetValue(state.WithPosition(move.Row, move.Column, name))).Last();
     }
 }

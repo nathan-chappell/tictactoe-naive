@@ -4,13 +4,25 @@ var game = new ConsoleGame(randomStrategy);
 
 // game.Start();
 
-var vf = new ValueFunction(PositionState.Player);
+var playerStrategy = new EpsilonGreedyStrategy(new ValueFunction(PositionState.Player), .1);
+var trainer = new OffPolicyTrainer();
 
-Console.WriteLine($"You are: {PositionState.Player}");
+var evaluationIterations = 400;
+var trainingIterations = 1000;
+var epochs = 40;
 
-foreach (var state in TicTacToeState.GetAllStates().Where(state => state.IsTerminal && state.IsValid).Take(100))
+var evaluationResults = new List<EvaluationResult>();
+
+for (var epoch = 0; epoch < epochs; ++epoch)
 {
-    Console.WriteLine($"Winner: {state.GetWinner()}");
-    Console.WriteLine($"Value: {vf.Values[state.Representation]}");
-    Console.WriteLine(state.GetDisplayString());
+    evaluationResults.Add(trainer.Evaluate(playerStrategy, randomStrategy, evaluationIterations));
+    trainer.Train(playerStrategy, randomStrategy, playerStrategy.ValueFunction, trainingIterations);
+}
+
+evaluationResults.Add(trainer.Evaluate(playerStrategy, randomStrategy, evaluationIterations));
+
+Console.WriteLine(EvaluationResult.Header);
+foreach (var evaluationResult in evaluationResults)
+{
+    Console.WriteLine(evaluationResult.GetDisplayRow());
 }
