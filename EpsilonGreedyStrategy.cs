@@ -12,6 +12,14 @@ public class EpsilonGreedyStrategy : ITicTacToeStrategy
 
     public (int Row, int Column) GetNextMove(TicTacToeState state, PositionState name)
     {
+        var winningMoves = TicTacToeState.GetWinningMoves(state, name);
+        if (winningMoves.Any())
+            return winningMoves.First();
+        
+        var losingMoves = TicTacToeState.GetWinningMoves(state, name.OtherPlayer());
+        if (losingMoves.Any())
+            return losingMoves.First();
+
         var nextMoves = state.GetAvailableMoves().ToList();
         if (random.NextDouble() < Epsilon)
             return nextMoves[random.Next(0, nextMoves.Count)];

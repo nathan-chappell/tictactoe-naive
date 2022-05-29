@@ -16,4 +16,11 @@ public static class PositionStateExtensions
         PositionState.Opponent => "o",
         _ => "!"
     };
+
+    public static PositionState OtherPlayer(this PositionState positionState) => positionState switch
+    {
+        PositionState.Player => PositionState.Opponent,
+        PositionState.Opponent => PositionState.Player,
+        _ => throw new NotImplementedException()
+    };
 }

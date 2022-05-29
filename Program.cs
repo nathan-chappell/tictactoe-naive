@@ -5,7 +5,7 @@
 var timestr = DateTime.UtcNow;
 using var output = new StreamWriter($"/home/nathan/programming/cs/tictactoe/data/training_output_{timestr.ToString("yyyyMMdd_HHmmss")}.txt");
 
-var playerGreedyStrategy = new EpsilonGreedyStrategy(new ValueFunction(PositionState.Player), .1);
+var playerGreedyStrategy = new EpsilonGreedyStrategy(new ValueFunction(PositionState.Player), .05);
 
 var playerStrategies = new ITicTacToeStrategy[]
 {
@@ -51,8 +51,8 @@ foreach (var opponentStrategy in opponentStrategies)
 
 public static class Util
 {
-    const int defaultEvaluationIterations = 1000;
-    const int defaultTrainingIterations = 1000;
+    const int defaultEvaluationIterations = 2000;
+    const int defaultTrainingIterations = 2000;
     const int defaultEpochs = 5;
 
     public static void Train(
