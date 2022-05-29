@@ -3,8 +3,13 @@ using System.Text;
 
 public readonly struct TicTacToeState
 {
-    public static readonly int TOTAL_NUMBER_OF_STATES = (int)Math.Pow(3, 9);
     public static readonly int REPRESENTATION_SIZE = (int)Math.Pow(4, 9);
+    public static int TotalNumberOfStates { get; }
+
+    static TicTacToeState()
+    {
+        TotalNumberOfStates = GetAllStates().Count();
+    }
 
     public readonly int Representation;
 
@@ -13,33 +18,18 @@ public readonly struct TicTacToeState
         Representation = representation;
     }
 
-    public bool IsTerminal
-    {
-        get
-        {
-            if (GetWinner() != PositionState.None)
-                return true;
-            for (int i = 0; i < 9; ++i)
-            {
-                if ((Representation & (0x03 << (i * 2))) == 0)
-                    return false;
-            }
-            return true;
-        }
-    }
-
     public bool IsValid
     {
         get
         {
             var (playerCount, opponentCount, _) = GetPositionCounts();
-            var diff = playerCount - opponentCount;
-            if (diff < 0 || diff > 1)
+            var diff = Math.Abs(playerCount - opponentCount);
+            if (diff > 1)
                 return false;
             return GetWinner() switch
             {
-                PositionState.Player => diff == 1,
-                PositionState.Opponent => diff == 0,
+                PositionState.Player => playerCount >= opponentCount,
+                PositionState.Opponent => opponentCount >= playerCount,
                 PositionState.Both => false,
                 PositionState.None => true,
                 _ => throw new NotImplementedException(),
@@ -54,6 +44,7 @@ public readonly struct TicTacToeState
         0 => PositionState.None,
         1 => PositionState.Player,
         2 => PositionState.Opponent,
+        3 => PositionState.Both,
         _ => throw new NotImplementedException($"Invalid value for Position: {GetPosition(row, column):X2}")
     };
 
@@ -85,9 +76,8 @@ public readonly struct TicTacToeState
     {
         for (int row = 0; row < 3; ++row)
             for (int column = 0; column < 3; ++column)
-                    if (GetPositionState(row,column) != PositionState.None)
-                        continue;
-                    else yield return (row, column);
+                if (GetPositionState(row,column) == PositionState.None)
+                    yield return (row, column);
     }
 
     public (int PlayerCount, int OpponentCount, int NoneCount) GetPositionCounts()
@@ -183,11 +173,7 @@ public readonly struct TicTacToeState
 
         TicTacToeState getState()
         {
-            // TicTacToeState result = new(0);
             int representation = 0;
-            // for (int row = 0; row < 3; ++row)
-            //     for (int column = 0; column < 3; ++column)
-            //         result = result.WithPosition(row, column, (PositionState)stateDigits[row * 3 + column]);
             for (int row = 0; row < 3; ++row)
                 for (int column = 0; column < 3; ++column)
                     representation |= stateDigits[row * 3 + column] << 2 * (row * 3 + column);
@@ -197,7 +183,9 @@ public readonly struct TicTacToeState
 
         while (!done())
         {
-            yield return getState();
+            var nextState = getState();
+            if (nextState.IsValid)
+                yield return nextState;
             inc();
         }
     }
